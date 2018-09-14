@@ -24,17 +24,20 @@ def get_list(r, s, lim, rel=operator.le):
     return my_list
 
 '''here goes the Omega, inclination and true anomaly counts we need'''
-omega_count= 48            #number of omegas to try from pi/(omega_count/2) to pi (we dont use pi to 2pi because it is symmetric
-inc_count= 48              #number of inclinations to try from -pi/2 to pi/2 (we have 30 steps)
-f_count= 48                #number of true anomalies from the step size to 2*pi
+omega_count= 12            #number of omegas to try from pi/(omega_count/2) to pi (we dont use pi to 2pi because it is symmetric
+inc_count= 12              #number of inclinations to try from -pi/2 to pi/2 (we have 30 steps)
+f_count= 12                #number of true anomalies from the step size to 2*pi
 
 
-'''here we make lists of omega,x,vz,inc and m'''
-omega_list = get_list(0, 2* math.pi/omega_count, 2 * math.pi-math.pi/omega_count, rel=operator.le)
-x_list = get_list(0.8, 0.1, 0.8)
+'''here we make lists of mass[m], Impact parameter [x], secondary star velocity [vz], 
+   orbital inclination [inc], longitude of node [omega] and True anomaly [f]         '''
+
+m_list = get_list(r=0.5, s=0.5, lim=0.5)
+x_list = get_list(0.4, 0.1, 5)
 vz_list = get_list(-1, s=-1, lim=-1, rel=operator.ge)
+
 inc_list = get_list(r=-((math.pi/2)-math.pi/(inc_count)), s=math.pi/(inc_count), lim=math.pi/2, rel=operator.le)
-m_list = get_list(r=1, s=0.5, lim=1)
+omega_list = get_list(0, 2* math.pi/omega_count, 2 * math.pi-math.pi/omega_count, rel=operator.le)
 f_list = get_list(r=2*math.pi/f_count, s=2*math.pi/f_count, lim=2*math.pi)
 
 '''Printing the lists lengths to see if there is any problem'''
@@ -51,11 +54,11 @@ Percentage_array=[]
 # print('number of rows and columns of subplots: {sub}'.format(sub=subnumber))
 
 res = {}
-with open('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega_inc_f_3/inclination_change_x({min:.2f}-{max:.2f})_{total_count}k.txt'.format(min=min(x_list),
+with open('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_m_Omega_inc_f/inclination_change_x({min:.2f}-{max:.2f})_{total_count}k.txt'.format(min=min(x_list),
                                                                                                                        max=max(x_list),
                                                                                                                        total_count=omega_count*(inc_count)/1000), 'w+') as g:
     g.write('inc\tincdifavg\n')
-    with open('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega_inc_f_3/Data_x({min:.2f}-{max:.2f})_{total_count}k.txt'.format(min=min(x_list),
+    with open('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_m_Omega_inc_f/Data_x({min:.2f}-{max:.2f})_{total_count}k.txt'.format(min=min(x_list),
                                                                                                                        max=max(x_list),
                                                                                                                        total_count=omega_count*(inc_count)/1000), 'w+') as h:
         h.write('StarM\tStarx\tStarv\tPiinc\tPiOmega\tPif\tPfinc\tPfOmega\tPff\taf\tef\tenergydif%\tangmomdif%\tin?\n')

@@ -14,13 +14,13 @@ def get_list(r, s, lim, rel=operator.le):
     return my_list
 
 '''here goes the omega and inclination counts we need'''
-omega_count= 10            #number of omegas to try from pi/(omega_count/2) to 2*pi
-inc_count= 10              #number of inclinations -1 to try from -pi/2 to pi/2 (we have 30 steps)
+omega_count= 1            #number of omegas to try from pi/(omega_count/2) to 2*pi
+inc_count= 6              #number of inclinations -1 to try from -pi/2 to pi/2 (we have 30 steps)
 
 
 '''here we make lists of omega,x,vz,inc and m'''
 omega_list = get_list(0, 2* math.pi/omega_count, 2 * math.pi-math.pi/omega_count, rel=operator.le)
-x_list = get_list(1.5, 1, 4.5)
+x_list = get_list(1.4, 1, 1.4)
 vz_list = get_list(-1, s=-1, lim=-1, rel=operator.ge)
 inc_list = get_list(r=-(math.pi/2), s=math.pi/(inc_count), lim=math.pi/2, rel=operator.le)
 m_list = get_list(r=1, s=0.5, lim=1)
@@ -29,7 +29,7 @@ print(len(omega_list))
 Percentage_array=[]
 
 res = {}
-with open('/Users/Behzadarbab/Exoplanet_Simulations/Earth_Omega&inc_Var_Animation/2/Data_x({min}-{max})_{total_count}k.txt'.format(min=min(x_list),
+with open('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega&inc_Var_Animation/2/Data_x({min}-{max})_{total_count}k.txt'.format(min=min(x_list),
                                                                                                                        max=max(x_list),
                                                                                                                        total_count=omega_count*(inc_count)/1000), 'w+') as f:
     for m in m_list:
@@ -59,7 +59,7 @@ with open('/Users/Behzadarbab/Exoplanet_Simulations/Earth_Omega&inc_Var_Animatio
                             sim.add(m=m, x=x, z=50, vz=v)                           #add the passing star
 
                             sim.move_to_com()
-                            sim.integrate(round(2 * 50*(tt+25) / ((-v)*100), 0))                           #integration
+                            sim.integrate(round(2*50*(tt+25) / ((-v)*100), 0))                           #integration
                             # a_e = sim.calculate_orbits()[0]                         #calculating orbital elements after the integration
                             # res[(m, x, v, inc, o)] = (a_e.a, a_e.e)
 
@@ -77,7 +77,7 @@ with open('/Users/Behzadarbab/Exoplanet_Simulations/Earth_Omega&inc_Var_Animatio
                             fig = rebound.OrbitPlot(sim, trails=True, slices=True, color=True,periastron=True, unitlabel="[AU]", lim=5., limz=5)
                             # plt.title('X={x} m={m} vz={vz} inc={inc} Omega={Omega}'.format(x=round(x,1), m=m, vz=v, inc=inc, Omega=o))
                             plt.savefig(
-                                '/Users/Behzadarbab/Exoplanet_Simulations/Earth_Omega&inc_Var_Animation/3/X{x}m{m}v{v}inc{inc}Omega{o}t{t}.png'.format(
+                                '/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega&inc_Var_Animation/new/X{x}m{m}v{v}inc{inc}Omega{o}t{t}.png'.format(
                                     x=round(x, 1), m=m, v=v, inc=round(inc, 2), o=round(o, 2), t=(tt+25)), dpi=100)
                             plt.close()
 
@@ -93,5 +93,5 @@ with open('/Users/Behzadarbab/Exoplanet_Simulations/Earth_Omega&inc_Var_Animatio
                 # plt.ylabel('inclination')
                 # plt.title('X={x}, m={m}, vz={vz}({total_count}k)({P} percent)'.format(x=round(x,1),m=m, vz=v, total_count=(omega_count*(inc_count)/1000), P=Percentage))
                 # plt.axes().set_aspect('equal', 'datalim')
-                # plt.savefig('/Users/Behzadarbab/Exoplanet_Simulations/Earth_Omega&inc_Var_Animation/X{x}m{m}v{v}({total_count}k)({P} percent).pdf'.format(x=round(x,1),m=m, v=v, total_count=(omega_count*(inc_count)/1000),
+                # plt.savefig('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega&inc_Var_Animation/X{x}m{m}v{v}({total_count}k)({P} percent).pdf'.format(x=round(x,1),m=m, v=v, total_count=(omega_count*(inc_count)/1000),
                 #                                                                                                                     P=Percentage), bbox_inches='tight')

@@ -18,12 +18,15 @@ inc_count= 48              #number of inclinations to try from -pi/2 to pi/2 (we
 f_count= 48                #number of true anomalies from the step size to 2*pi
 
 
-'''here we make lists of omega,x,vz,inc and m'''
-omega_list = get_list(0, 2* math.pi/omega_count, 2 * math.pi-math.pi/omega_count, rel=operator.le)
-x_list = get_list(2., 1, 2)
+''''here we make lists of mass[m], Impact parameter [x], secondary star velocity [vz], 
+   orbital inclination [inc], longitude of node [omega] and True anomaly [f]         '''
+
+m_list = get_list(r=0.5, s=0.5, lim=0.5)
+x_list = get_list(0.4, 1, 3)
 vz_list = get_list(-1, s=-1, lim=-1, rel=operator.ge)
+
 inc_list = get_list(r=-((math.pi/2)-math.pi/(inc_count)), s=math.pi/(inc_count), lim=math.pi/2, rel=operator.le)
-m_list = get_list(r=1, s=0.5, lim=1)
+omega_list = get_list(0, 2* math.pi/omega_count, 2 * math.pi-math.pi/omega_count, rel=operator.le)
 f_list = get_list(r=2*math.pi/f_count, s=2*math.pi/f_count, lim=2*math.pi)
 
 '''Printing the lists lengths to see if there is any problem'''
@@ -40,11 +43,11 @@ subnumber = math.ceil(math.sqrt(len(inc_list)))
 print('number of rows and columns of subplots: {sub}'.format(sub=subnumber))
 
 res = {}
-with open('/Users/Behzadarbab/Exoplanet_Simulations/Earth_Omega_inc_f/chances_x({min}-{max})_{total_count}k.txt'.format(min=min(x_list),
+with open('/Users/Behzadarbab/Exoplanet_Simulations/Earth_m_Omega_inc_f/chances_m({mmin}-{mmax})_x({min}-{max})_{total_count}k.txt'.format(mmin=min(m_list), mmax=max(m_list), min=min(x_list),
                                                                                                                        max=max(x_list),
                                                                                                                        total_count=omega_count*(inc_count)/1000), 'w+') as g:
     g.write('x\t%\n')
-    with open('/Users/Behzadarbab/Exoplanet_Simulations/Earth_Omega_inc_f/Data_x({min}-{max})_{total_count}k.txt'.format(min=min(x_list),
+    with open('/Users/Behzadarbab/Exoplanet_Simulations/Earth_m_Omega_inc_f/Data_m({mmin}-{mmax})_x({min}-{max})_{total_count}k.txt'.format(mmin=min(m_list), mmax=max(m_list), min=min(x_list),
                                                                                                                        max=max(x_list),
                                                                                                                        total_count=omega_count*(inc_count)/1000), 'w+') as h:
        for m in m_list:
