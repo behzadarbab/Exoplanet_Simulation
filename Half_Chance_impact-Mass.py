@@ -32,20 +32,19 @@ def get_log_list(r, s, lim, rel=operator.le):
     return my_list
 
 '''here goes the Omega, inclination and true anomaly counts we need'''
-omega_count= 5            #number of omegas to try from pi/(omega_count/2) to pi (we dont use pi to 2pi because it is symmetric
-inc_count= 5              #number of inclinations to try from -pi/2 to pi/2 (we have 30 steps)
-f_count= 5                #number of true anomalies from the step size to 2*pi
+omega_count= 30            #number of omegas to try from pi/(omega_count/2) to pi (we dont use pi to 2pi because it is symmetric
+inc_count= 30              #number of inclinations to try from -pi/2 to pi/2 (we have 30 steps)
+f_count= 30                #number of true anomalies from the step size to 2*pi
 
 '''here we make lists of omega,x,vz,inc and m'''
 omega_list = get_list(0, 2* math.pi/omega_count, 2 * math.pi-math.pi/omega_count, rel=operator.le)
-x_list = get_list(6.02, 0.02, 100.0)
-# vz_list = get_log_list(0.5, s=0.04, lim=0, rel=operator.le)
+x_list = get_list(0.70, 0.01, 100.0)
 vz_list = get_list(3, 0.04, 3, rel=operator.le)
 print("v:",vz_list)
 inc_list = get_list(r=-((math.pi/2)-math.pi/(inc_count)), s=math.pi/(inc_count), lim=math.pi/2, rel=operator.le)
-m_list = get_log_list(r=0.96, s=0.04, lim=1.01)
+m_list = get_log_list(r=-1.0, s=0.04, lim=-1.0)
 print("m:", m_list)
-hwlist = get_list(0.2, s=0.02, lim= 0.2)
+hwlist = get_list(0.2, s=0.2, lim= 0.2)
 f_list = get_list(r=2*math.pi/f_count-0.0001 , s=2*math.pi/f_count, lim=2*math.pi)
 
 '''Printing the lists lengths to see if there is any problem'''
@@ -60,7 +59,7 @@ subnumber = math.ceil(math.sqrt(len(inc_list)))
 print('number of rows and columns of subplots: {sub}'.format(sub=subnumber))
 
 res = {}
-with open('/Users/atefeh-behzad/Exoplanet_Simulations/Half_Chance_impact-Mass/HZhw({minhw:.2f}-{maxhw:.2f})_x({min:.2f}-{max:.2f})_v({minv:.2f}-{maxv:.2f})_m({minm:.1f}-{maxm:.1f})_{total_count}k.txt'.format(minhw=min(hwlist), maxhw=max(hwlist), min=min(x_list),
+with open('/Users/atefeh-behzad/Exoplanet_Simulations/Half_Chance_impact-Mass/HZhw({minhw:.2f}-{maxhw:.2f})_x({min:.2f}-{max:.2f})_v({minv:.2f}-{maxv:.2f})_m({minm:.2f}-{maxm:.2f})_{total_count}k.txt'.format(minhw=min(hwlist), maxhw=max(hwlist), min=min(x_list),
                                                                                                                        max=max(x_list),minv=min(vz_list), maxv=max(vz_list), minm=min(m_list), maxm=max(m_list),
                                                                                                                        total_count=omega_count*f_count*inc_count/1000), 'w+') as g:
     g.write('v\tm\tx\n')
@@ -101,7 +100,7 @@ with open('/Users/atefeh-behzad/Exoplanet_Simulations/Half_Chance_impact-Mass/HZ
 
                     Percentage = (round((counter / (inc_count * omega_count * (f_count))) * 100, 2))
                     if Percentage >= 50:
-                        g.write('\t{v:.2f}\t{m:.2f}\t{x:.2f}\n'.format(v=-v, m=m, x=x))
+                        g.write('{v:.2f}\t{m:.2f}\t{x:.2f}\n'.format(v=-v, m=m, x=x))
                         break
 
-os.system('say "A simulation has finished"')
+os.system('say "finished"')

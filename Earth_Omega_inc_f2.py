@@ -24,14 +24,14 @@ def get_list(r, s, lim, rel=operator.le):
     return my_list
 
 '''here goes the Omega, inclination and true anomaly counts we need'''
-omega_count= 48            #number of omegas to try from pi/(omega_count/2) to pi (we dont use pi to 2pi because it is symmetric
-inc_count= 48              #number of inclinations to try from -pi/2 to pi/2 (we have 30 steps)
-f_count= 48                #number of true anomalies from the step size to 2*pi
+omega_count= 10            #number of omegas to try from pi/(omega_count/2) to pi (we dont use pi to 2pi because it is symmetric
+inc_count= 10              #number of inclinations to try from -pi/2 to pi/2 (we have 30 steps)
+f_count= 10                #number of true anomalies from the step size to 2*pi
 
 
 '''here we make lists of omega,x,vz,inc and m'''
 omega_list = get_list(0, 2* math.pi/omega_count, 2 * math.pi-math.pi/omega_count, rel=operator.le)
-x_list = get_list(0.5, 0.1, 1.61)
+x_list = get_list(0.5, 0.01, 10)
 vz_list = get_list(-1, s=-1, lim=-1, rel=operator.ge)
 inc_list = get_list(r=-((math.pi/2)-math.pi/(inc_count)), s=math.pi/(inc_count), lim=math.pi/2, rel=operator.le)
 m_list = get_list(r=1, s=0.5, lim=1)
@@ -77,8 +77,8 @@ with open('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega_inc_f_2/chance
 
                     for inc in inc_list:
 
-                        # plotnumber= int(round((inc+math.pi/2)*inc_count/math.pi, 0))
-                        # print('\nplot number: {pl}'.format(pl=plotnumber))
+                        plotnumber= int(round((inc+math.pi/2)*inc_count/math.pi, 0))
+                        print('\nplot number: {pl}'.format(pl=plotnumber))
 
                         # plt.subplot(6,8, plotnumber)
 
@@ -101,26 +101,26 @@ with open('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega_inc_f_2/chance
                                 sim.add(m=3e-6, a=1, Omega=o, inc=inc, f=f)             #add Earth
                                 sim.add(m=m, x=x, z=50, vz=v)                           #add the passing star
                                 a_c = sim.calculate_orbits()[0]
-                                # print('initial1: 1.00, 0.00, {inc:.2f}, {o:.2f}, {f:.2f}\n'.format(o=o, inc=inc, f=f))
-                                # print('  initial2: {a:.2f}, {e:.2f}, {inc:.2f}, {Omega:.2f}, {f:.2f} \n'.format(a=a_c.a, e=a_c.e, inc=a_c.inc, Omega=a_c.Omega, f=a_c.f))
+                                print('initial1: 1.00, 0.00, {inc:.2f}, {o:.2f}, {f:.2f}\n'.format(o=o, inc=inc, f=f))
+                                print('  initial2: {a:.2f}, {e:.2f}, {inc:.2f}, {Omega:.2f}, {f:.2f} \n'.format(a=a_c.a, e=a_c.e, inc=a_c.inc, Omega=a_c.Omega, f=a_c.f))
                                 sim.integrate(round(2 * 50 / (-v), 0))                  #integration
 
                                 a_e = sim.calculate_orbits()[0]                         #calculating orbital elements of the planet after the integration
                                 res[(m, x, v, inc, o, f)] = (a_e.a, a_e.e)
-                                # print('  final:    {a:.2f}, {e:.2f}, {inc:.2f}, {Omega:.2f}, {f:.2f} \n'.format(a=a_e.a,
-                                #                                                                                e=a_e.e,
-                                #                                                                                inc=a_e.inc,
-                                #                                                                                Omega=a_e.Omega,
-                                #                                                                                f=a_e.f))
+                                print('  final:    {a:.2f}, {e:.2f}, {inc:.2f}, {Omega:.2f}, {f:.2f} \n'.format(a=a_e.a,
+                                                                                                               e=a_e.e,
+                                                                                                               inc=a_e.inc,
+                                                                                                               Omega=a_e.Omega,
+                                                                                                               f=a_e.f))
                                 '''determine the color of HZ orbits in omega-inc plot'''
-                                # if (a_e.a*(1+a_e.e))<1.2 and (a_e.a*(1-a_e.e))>0.8:
-                                #     Color = '0'
-                                #     counter += 1
-                                # else:
-                                #     Color = '0.75'
+                                if (a_e.a*(1+a_e.e))<1.2 and (a_e.a*(1-a_e.e))>0.8:
+                                    Color = '0'
+                                    counter += 1
+                                else:
+                                    Color = '0.75'
 
 
-                                # plt.plot(o, f, color=Color, marker='s', ms=6)
+                                plt.plot(o, f, color=Color, marker='s', ms=6)
 
 
                                 h.write(
@@ -128,14 +128,14 @@ with open('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega_inc_f_2/chance
                                                                                             a=a_e.a,
                                                                                             e=a_e.e))
 
-                    #     plt.xlabel('Omega (initial phase)')
-                    #     plt.ylabel('True Initial Anomaly')
-                    #     plt.title('inc={inc}[rad]'.format(inc=round(inc, 3)))
-                    # plt.tight_layout()
-                    # plt.subplots_adjust(top=0.95)
-                    # Percentage = (round((counter / (inc_count * omega_count * (f_count))) * 100, 2))
-                    # plt.suptitle('X={x}, m={m}, vz={vz},({total_count}k) Percentage={P}'.format(x=round(x, 2), m=m, vz=v,total_count=(omega_count*inc_count*f_count), P=Percentage), fontsize=25)
-                    # plt.savefig('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega_inc_f_2/X{x}m{m}v{v}({total_count}k).pdf'.format(x=round(x,2),m=m, v=v, total_count=(omega_count*(inc_count)*f_count/1000)
-                    #                                                                                                                     ), bbox_inches='tight')
-                    # g.write('{x}\t{Percentage}\n'.format(x=x, Percentage=Percentage))
+                        plt.xlabel('Omega (initial phase)')
+                        plt.ylabel('True Initial Anomaly')
+                        plt.title('inc={inc}[rad]'.format(inc=round(inc, 3)))
+                    plt.tight_layout()
+                    plt.subplots_adjust(top=0.95)
+                    Percentage = (round((counter / (inc_count * omega_count * (f_count))) * 100, 2))
+                    plt.suptitle('X={x}, m={m}, vz={vz},({total_count}k) Percentage={P}'.format(x=round(x, 2), m=m, vz=v,total_count=(omega_count*inc_count*f_count), P=Percentage), fontsize=25)
+                    plt.savefig('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega_inc_f_2/X{x}m{m}v{v}({total_count}k).pdf'.format(x=round(x,2),m=m, v=v, total_count=(omega_count*(inc_count)*f_count/1000)
+                                                                                                                                        ), bbox_inches='tight')
+                    g.write('{x}\t{Percentage}\n'.format(x=x, Percentage=Percentage))
                 plt.close()
