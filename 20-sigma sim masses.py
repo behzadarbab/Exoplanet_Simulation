@@ -16,10 +16,11 @@ import rebound
 import math
 import operator
 import os
-import numpy as np
 
 
 '''we define listing'''
+
+
 def get_list(r, s, lim, rel=operator.le):
     my_list = []
     while rel(r, lim):
@@ -27,7 +28,10 @@ def get_list(r, s, lim, rel=operator.le):
         r += s
     return my_list
 
+
 '''we define listing for vz in 10**x form'''
+
+
 def get_log_list(r, s, lim, rel=operator.le):
     my_list = []
     while rel(r, lim):
@@ -37,61 +41,60 @@ def get_log_list(r, s, lim, rel=operator.le):
 
 
 '''initializing some parameters'''
-x=1
-x_step=0.1
-vx=np.array([[0],[0]])
+x = 1
+x_step = 0.1
 
 #####################
-x_max=100
-x_min0=2
-m=0.33
+x_max = 100
+x_min0 = 2
+v = 0.33
 #####################
 
-m_list = get_log_list(0.90, s=0.05, lim=0.91, rel=operator.le)
+m_list = get_log_list(-1.00, s=0.05, lim=-0.74, rel=operator.le)
 print("m:", m_list)
 
-Percentage_array=[]
+Percentage_array = []
 
 res = {}
-with open('/Users/atefeh-behzad/Exoplanet_Simulations/2-Sigma/velocities_v({minv:.2f}-{maxv:.2f})_m({m:.2f}).txt'.format(minv=min(vz_list), maxv=max(vz_list), m=m) , 'w+') as g:
+with open('/Users/atefeh-behzad/Exoplanet_Simulations/2-Sigma/Masses_m({minm:.2f}-{maxm:.2f})_v({v:.2f}).txt'.format(minm=min(m_list), maxm=max(m_list), v=v) , 'w+') as g:
     g.write('m\tLog(v)\tLog(x)\n')
-    for v in vz_list:
+    for m in m_list:
         level = 0
-        x_min=x_min0
-        while level<6:
-            if level==0:
+        x_min = x_min0
+        while level < 6:
+            if level == 0:
+                omega_count = 3
+                inc_count = 3
+                f_count = 3
+                x_step = 1
+                print('level 0')
+            if level == 1:
                 omega_count = 4
                 inc_count = 4
                 f_count = 4
-                x_step = 0.5
-                print('level 0')
-            if level==1:
-                omega_count=5
-                inc_count=5
-                f_count=5
-                x_step=0.1
-                print('level 1')
-            if level==2:
-                omega_count=10
-                inc_count=10
-                f_count=10
-                x_step=0.04
-                print('level 2')
-            if level==3:
-                omega_count=12
-                inc_count=12
-                f_count=12
-                x_step=0.02
-                print('level 3')
-            if level==4:
-                omega_count=20
-                inc_count=20
-                f_count=20
-                x_step=0.01
-                print('level 4')
-            if level==5:
-                print('level 5')
-                g.write('{m:.2f}\t{Logv:.4f}\t{Logx:.4f}\n'.format(m=m, Logv=math.log10(v), Logx=math.log10(x)))
+                x_step = 0.2
+                print('level 1........................................')
+            if level == 2:
+                omega_count = 5
+                inc_count = 5
+                f_count = 5
+                x_step = 0.1
+                print('level 2........................................')
+            if level == 3:
+                omega_count = 8
+                inc_count = 8
+                f_count = 8
+                x_step = 0.04
+                print('level 3........................................')
+            if level == 4:
+                omega_count = 10
+                inc_count = 10
+                f_count = 10
+                x_step = 0.02
+                print('level 4........................................')
+            if level == 5:
+                print('level 5........................................')
+                g.write('{logm:.4f}\t{v:.2f}\t{Logx:.4f}\n'.format(logm=math.log10(m), v=v, Logx=math.log10(x)))
                 break
             '''here we make lists of omega,x,vz,inc and m'''
             omega_list = get_list(0, 2 * math.pi / omega_count, 2 * math.pi - math.pi / omega_count,
@@ -104,7 +107,7 @@ with open('/Users/atefeh-behzad/Exoplanet_Simulations/2-Sigma/velocities_v({minv
             for x in x_list:
 
                 counter = 0                                                         # this is the counter for calculating percentage
-                print('\nm={m:.2f}\tv={v:.2f}\tx={x:.2f}'.format(v=v, x=x, m=m))
+                print('\nm={m:.2f}\tv={v:.2f}\tx={x:.3f}'.format(v=v, x=x, m=m))
 
                 for inc in inc_list:
 
@@ -129,16 +132,16 @@ with open('/Users/atefeh-behzad/Exoplanet_Simulations/2-Sigma/velocities_v({minv
                             if (abs(a_e.a)*(1+a_e.e))<(1.37) and (abs(a_e.a)*(1-a_e.e))>(0.95):
                                 counter += 1
 
-                Percentage = (round((counter / (inc_count * omega_count * (f_count))) * 100, 2))
+                Percentage = (round((counter / (inc_count * omega_count * f_count)) * 100, 2))
                 if Percentage >= 95:
                     if level==0:
-                        x_min=x-1.5
+                        x_min=x-2
                     if level==1:
                         x_min=x-1.0
                     if level==2:
                         x_min=x-0.2
                     if level==3:
-                        x_min=x-0.15
+                        x_min=x-0.08
                     level+=1
                     break
 os.system('say "finished"')
