@@ -1,0 +1,179 @@
+<html>
+<head>
+<title>inclination-chance behavior.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: #999999; font-weight: normal; font-style: normal; }
+.s0 { color: rgb(128,128,128); font-style: italic; }
+.s1 { color: rgb(0,0,0); }
+.s2 { color: rgb(0,0,128); font-weight: bold; }
+.s3 { color: rgb(0,128,128); font-weight: bold; }
+.s4 { color: rgb(0,0,255); }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+inclination-chance behavior.py</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">&quot;&quot;&quot;                                             Briefing about the simulation 
+This program simulates a three body system; Sun, Earth, a passing star. The passing star starts from 50 AU above the 
+Solar system plane. We throw the star with a speed (or we can change the speed or give a list of speeds), then after a 
+time that it reaches around 50 AU below the solar plane, we stop the single simulation and check if the planet orbit 
+reaches beyond the HZ aroound sun (0.8AU-1.2AU). Then we do this simulation for different inclinations and directions 
+of the planet orbit and we change the place of the planet on the orbit. After this, we can make a 3D plot (a grand plot 
+with many subplots in 2D) and if in a simulation, after the flyby, the planet stays in HZ, we plot it in black, otherwise 
+in gray.&quot;&quot;&quot;</span><span class="s1"> 
+ 
+ 
+ 
+</span><span class="s2">import </span><span class="s1">rebound 
+</span><span class="s2">import </span><span class="s1">math 
+</span><span class="s2">import </span><span class="s1">operator 
+</span><span class="s2">import </span><span class="s1">matplotlib.pyplot </span><span class="s2">as </span><span class="s1">plt 
+ 
+ 
+</span><span class="s3">'''we define listing here'''</span><span class="s1"> 
+</span><span class="s2">def </span><span class="s1">get_list(r, s, lim, rel=operator.le): 
+    my_list = [] 
+    </span><span class="s2">while </span><span class="s1">rel(r, lim): 
+        my_list.append(r) 
+        r += s 
+    </span><span class="s2">return </span><span class="s1">my_list 
+ 
+</span><span class="s3">'''here goes the Omega, inclination and true anomaly counts we need'''</span><span class="s1"> 
+omega_count= </span><span class="s4">12            </span><span class="s0">#number of omegas to try from pi/(omega_count/2) to pi (we dont use pi to 2pi because it is symmetric</span><span class="s1"> 
+inc_count= </span><span class="s4">12              </span><span class="s0">#number of inclinations to try from -pi/2 to pi/2 (we have 30 steps)</span><span class="s1"> 
+f_count= </span><span class="s4">12                </span><span class="s0">#number of true anomalies from the step size to 2*pi</span><span class="s1"> 
+HZhwidth= </span><span class="s4">0.05              </span><span class="s0">#Habitable Zone Witdh/2</span><span class="s1"> 
+ 
+ 
+</span><span class="s3">'''here we make lists of omega,x,vz,inc and m'''</span><span class="s1"> 
+m_list = get_list(r=</span><span class="s4">0.01</span><span class="s1">, s=</span><span class="s4">0.2</span><span class="s1">, lim=</span><span class="s4">0.01</span><span class="s1">) 
+x_list = get_list(</span><span class="s4">0.5</span><span class="s1">, </span><span class="s4">0.1</span><span class="s1">, </span><span class="s4">2</span><span class="s1">) 
+vz_list = get_list(-</span><span class="s4">0.5</span><span class="s1">, s=-</span><span class="s4">0.5</span><span class="s1">, lim=-</span><span class="s4">2</span><span class="s1">, rel=operator.ge) 
+ 
+inc_list = [</span><span class="s4">0</span><span class="s1">, math.pi/</span><span class="s4">4</span><span class="s1">, math.pi/</span><span class="s4">2</span><span class="s1">] 
+omega_list = get_list(</span><span class="s4">0</span><span class="s1">, </span><span class="s4">2</span><span class="s1">* math.pi/omega_count, </span><span class="s4">2 </span><span class="s1">* math.pi-math.pi/omega_count, rel=operator.le) 
+f_list = get_list(r=</span><span class="s4">2</span><span class="s1">*math.pi/f_count-</span><span class="s4">0.0001 </span><span class="s1">, s=</span><span class="s4">2</span><span class="s1">*math.pi/f_count, lim=</span><span class="s4">2</span><span class="s1">*math.pi) 
+ 
+</span><span class="s3">'''Printing the lists lengths to see if there is any problem'''</span><span class="s1"> 
+print(inc_list) 
+print(</span><span class="s3">'length of inclination list= {inclist}'</span><span class="s1">.format(inclist=len(inc_list))) 
+print(</span><span class="s3">'length of Omega list= {omegalist}'</span><span class="s1">.format(omegalist=len(omega_list))) 
+print(</span><span class="s3">'length of True anomaly list= {anolist}'</span><span class="s1">.format(anolist=len(f_list))) 
+ 
+incdifsum = </span><span class="s4">0</span><span class="s1"> 
+Percentage_array=[] 
+ 
+</span><span class="s3">'''calculating the dimensions of the figure (subplots in height and width)'''</span><span class="s1"> 
+subnumber = math.ceil(math.sqrt(len(inc_list))) 
+print(</span><span class="s3">'number of rows and columns of subplots: {sub}'</span><span class="s1">.format(sub=subnumber)) 
+ 
+res = {} 
+</span><span class="s2">with </span><span class="s1">open(</span><span class="s3">'/Users/atefeh-behzad/Exoplanet_Simulations/Earth_m_Omega_inc_f/chances_incchange_HZh{HZhwidth}_x({min:.2f}-{max:.2f})_v_({minv:.2f}-{maxv:.2f})_m({mmin}-{mmax})_{total_count}k.txt'</span><span class="s1">.format(HZhwidth=HZhwidth,mmin=min(m_list), mmax=max(m_list), min=min(x_list), 
+                                                                                                                       max=max(x_list),minv=min(vz_list), maxv=max(vz_list), 
+                                                                                                                       total_count=omega_count*f_count*inc_count/</span><span class="s4">1000</span><span class="s1">), </span><span class="s3">'w+'</span><span class="s1">) </span><span class="s2">as </span><span class="s1">g: 
+    g.write(</span><span class="s3">'m</span><span class="s2">\t</span><span class="s3">v</span><span class="s2">\t</span><span class="s3">x</span><span class="s2">\t</span><span class="s3">%</span><span class="s2">\t</span><span class="s3">inc</span><span class="s2">\t</span><span class="s3">incdifavg</span><span class="s2">\n</span><span class="s3">'</span><span class="s1">) 
+    </span><span class="s2">with </span><span class="s1">open(</span><span class="s3">'/Users/atefeh-behzad/Exoplanet_Simulations/Earth_m_Omega_inc_f/Inclination_chance_HZh{HZhwidth}_x({min:.2f}-{max:.2f})_v_({minv:.2f}-{maxv:.2f})_m({mmin}-{mmax})_{total_count}k.txt'</span><span class="s1">.format(HZhwidth=HZhwidth, mmin=min(m_list), mmax=max(m_list), min=min(x_list), 
+                                                                                                                       max=max(x_list), minv=min(vz_list), maxv=max(vz_list), 
+                                                                                                                       total_count=omega_count*f_count*inc_count/</span><span class="s4">1000</span><span class="s1">), </span><span class="s3">'w+'</span><span class="s1">) </span><span class="s2">as </span><span class="s1">h: 
+        h.write(</span><span class="s3">'StarM</span><span class="s2">\t</span><span class="s3">Starx</span><span class="s2">\t</span><span class="s3">Starv</span><span class="s2">\t</span><span class="s3">Piinc</span><span class="s2">\t</span><span class="s3">PiOmega</span><span class="s2">\t</span><span class="s3">Pif</span><span class="s2">\t</span><span class="s3">Pfinc</span><span class="s2">\t</span><span class="s3">PfOmega</span><span class="s2">\t</span><span class="s3">Pff</span><span class="s2">\t</span><span class="s3">af</span><span class="s2">\t</span><span class="s3">ef</span><span class="s2">\t</span><span class="s3">energydif%</span><span class="s2">\t</span><span class="s3">angmomdif%</span><span class="s2">\t</span><span class="s3">in?</span><span class="s2">\n</span><span class="s3">'</span><span class="s1">) 
+        </span><span class="s2">for </span><span class="s1">m </span><span class="s2">in </span><span class="s1">m_list: 
+            print(</span><span class="s3">&quot;m= &quot;</span><span class="s1">, m) 
+ 
+            </span><span class="s2">for </span><span class="s1">v </span><span class="s2">in </span><span class="s1">vz_list: 
+ 
+                print(</span><span class="s3">&quot;vz= &quot;</span><span class="s1">, v) 
+                g.write(</span><span class="s3">'v= {v}</span><span class="s2">\n</span><span class="s3">'</span><span class="s1">.format(v=v)) 
+ 
+                </span><span class="s2">for </span><span class="s1">x </span><span class="s2">in </span><span class="s1">x_list: 
+ 
+                    print(</span><span class="s3">&quot;x= &quot;</span><span class="s1">, x) 
+ 
+                    plt.figure(figsize=(</span><span class="s4">5 </span><span class="s1">* subnumber, </span><span class="s4">5 </span><span class="s1">* subnumber)) 
+ 
+                    counter = </span><span class="s4">0  </span><span class="s0"># this is the counter for calculating percentage</span><span class="s1"> 
+ 
+                    </span><span class="s2">for </span><span class="s1">inc </span><span class="s2">in </span><span class="s1">inc_list: 
+ 
+                        plotnumber= int(round((inc+math.pi/</span><span class="s4">2</span><span class="s1">)*inc_count/math.pi, </span><span class="s4">0</span><span class="s1">)) 
+                        print(</span><span class="s3">'</span><span class="s2">\n</span><span class="s3">plot number: {pl}'</span><span class="s1">.format(pl=plotnumber)) 
+ 
+                        plt.subplot(subnumber,subnumber, plotnumber) 
+ 
+                        incdifsum = </span><span class="s4">0</span><span class="s1"> 
+ 
+                        inc_name= (inc+math.pi/</span><span class="s4">2</span><span class="s1">)*inc_count/(math.pi) 
+                        </span><span class="s0"># print(&quot;\t inc: {Q:.0f}&quot;.format(Q=inc_name))</span><span class="s1"> 
+ 
+ 
+ 
+                        </span><span class="s2">for </span><span class="s1">o </span><span class="s2">in </span><span class="s1">omega_list: 
+                            print(</span><span class="s3">'</span><span class="s2">\n</span><span class="s3">x={x:.2f}, Inc={inc:.0f}, Omega: {o:.0f}'</span><span class="s1">.format(x=x, inc=inc_name,o=omega_count*o/(</span><span class="s4">2</span><span class="s1">*math.pi))) 
+                            </span><span class="s0"># print(&quot;&quot;, end=&quot;                         Anomaly # &quot;)</span><span class="s1"> 
+                            </span><span class="s2">for </span><span class="s1">f </span><span class="s2">in </span><span class="s1">f_list: 
+                                </span><span class="s0"># print(&quot;{r:.0f}&quot;.format(r=f_count*f/(2*math.pi)), end=&quot; &quot;)</span><span class="s1"> 
+ 
+ 
+                                sim = rebound.Simulation()                              </span><span class="s0">#the simulation starts here</span><span class="s1"> 
+ 
+                                sim.add(m=</span><span class="s4">1</span><span class="s1">)                                            </span><span class="s0">#add Sun</span><span class="s1"> 
+                                sim.add(m=</span><span class="s4">3e-6</span><span class="s1">, a=</span><span class="s4">1</span><span class="s1">, Omega=o, inc=inc, f=f)             </span><span class="s0">#add Earth</span><span class="s1"> 
+                                sim.add(m=m, x=x, z=</span><span class="s4">50</span><span class="s1">, vz=v)                           </span><span class="s0">#add the passing star</span><span class="s1"> 
+                                a_c = sim.calculate_orbits()[</span><span class="s4">0</span><span class="s1">] 
+                                initenergy = sim.calculate_energy()                     </span><span class="s0">#total initial kinetic and potential energy</span><span class="s1"> 
+                                initangmom= sim.calculate_angular_momentum()            </span><span class="s0">#total initial angular momentum in 3 dimensions</span><span class="s1"> 
+ 
+                                sim.integrate(round(</span><span class="s4">2 </span><span class="s1">* </span><span class="s4">50 </span><span class="s1">/ (-v), </span><span class="s4">0</span><span class="s1">))                  </span><span class="s0">#integration</span><span class="s1"> 
+ 
+                                tinitangmom= math.sqrt(initangmom[</span><span class="s4">0</span><span class="s1">]**</span><span class="s4">2</span><span class="s1">+initangmom[</span><span class="s4">1</span><span class="s1">]**</span><span class="s4">2</span><span class="s1">+initangmom[</span><span class="s4">2</span><span class="s1">]**</span><span class="s4">2</span><span class="s1">)             </span><span class="s0">#Total size of initial angular momentum</span><span class="s1"> 
+ 
+                                </span><span class="s2">try</span><span class="s1">: 
+                                    angmomdif = math.sqrt(((initangmom[</span><span class="s4">0</span><span class="s1">]-sim.calculate_angular_momentum()[</span><span class="s4">0</span><span class="s1">])**</span><span class="s4">2 </span><span class="s1">+ \ 
+                                            (initangmom[</span><span class="s4">1</span><span class="s1">]-sim.calculate_angular_momentum()[</span><span class="s4">1</span><span class="s1">])**</span><span class="s4">2 </span><span class="s1">+ \ 
+                                            (initangmom[</span><span class="s4">2</span><span class="s1">]-sim.calculate_angular_momentum()[</span><span class="s4">2</span><span class="s1">])**</span><span class="s4">2</span><span class="s1">)/tinitangmom)        </span><span class="s0">#angular momentum difference devided by initial angular momentum</span><span class="s1"> 
+                                </span><span class="s2">except </span><span class="s1">ZeroDivisionError: 
+                                    angmomdif = float(</span><span class="s3">'inf'</span><span class="s1">) 
+ 
+ 
+                                a_e = sim.calculate_orbits()[</span><span class="s4">0</span><span class="s1">]                         </span><span class="s0">#calculating orbital elements of the planet after the integration</span><span class="s1"> 
+ 
+                                </span><span class="s3">'''determine the color of HZ orbits in omega-inc plot'''</span><span class="s1"> 
+                                </span><span class="s2">if </span><span class="s1">(abs(a_e.a)*(</span><span class="s4">1</span><span class="s1">+a_e.e))&lt;(</span><span class="s4">1</span><span class="s1">+HZhwidth) </span><span class="s2">and </span><span class="s1">(abs(a_e.a)*(</span><span class="s4">1</span><span class="s1">-a_e.e))&gt;(</span><span class="s4">1</span><span class="s1">-HZhwidth): 
+                                    Result = </span><span class="s3">'+'</span><span class="s1"> 
+                                    Color = </span><span class="s3">'0'</span><span class="s1"> 
+                                    counter += </span><span class="s4">1</span><span class="s1"> 
+                                </span><span class="s2">else</span><span class="s1">: 
+                                    Result = </span><span class="s3">''</span><span class="s1"> 
+                                    Color = </span><span class="s3">'0.75'</span><span class="s1"> 
+ 
+ 
+                                plt.plot(o, f, color=Color, marker=</span><span class="s3">'s'</span><span class="s1">, ms=</span><span class="s4">20</span><span class="s1">) 
+ 
+                                incdifsum += abs(abs(inc)-abs(a_e.inc)) 
+ 
+                                h.write( 
+                                    </span><span class="s3">'{m:.1f}</span><span class="s2">\t</span><span class="s3">{x:.2f}</span><span class="s2">\t</span><span class="s3">{v}</span><span class="s2">\t</span><span class="s3">{inc:.3f}</span><span class="s2">\t</span><span class="s3">{o:.3f}</span><span class="s2">\t</span><span class="s3">{f:.3f}</span><span class="s2">\t</span><span class="s3">{finc:.3f}</span><span class="s2">\t</span><span class="s3">{fo:.3f}</span><span class="s2">\t</span><span class="s3">{ff:.3f}</span><span class="s2">\t</span><span class="s3">{a:.3f}</span><span class="s2">\t</span><span class="s3">{e:.2g}</span><span class="s2">\t</span><span class="s3">{energychange:.2g}</span><span class="s2">\t\t</span><span class="s3">{angmomdif:.2g}</span><span class="s2">\t\t</span><span class="s3">{Result}</span><span class="s2">\n</span><span class="s3">'</span><span class="s1">.format(m=m, x=x, v=v, inc=inc, o=o, f=f, finc=a_e.inc, fo=a_e.Omega, ff=a_e.f, 
+                                                                                            a=a_e.a, 
+                                                                                            e=a_e.e, energychange=(</span><span class="s4">100</span><span class="s1">*abs((initenergy-sim.calculate_energy())/initenergy)), Result=Result, angmomdif=angmomdif)) 
+                        plt.xlabel(</span><span class="s3">'Omega (initial phase)'</span><span class="s1">) 
+                        plt.ylabel(</span><span class="s3">'True Initial Anomaly'</span><span class="s1">) 
+                        plt.title(</span><span class="s3">'inc={inc}[rad]'</span><span class="s1">.format(inc=round(inc, </span><span class="s4">3</span><span class="s1">))) 
+ 
+                        incdifavg= incdifsum/(len(omega_list)*len(f_list)) 
+                        g.write(</span><span class="s3">'</span><span class="s2">\t\t\t\t</span><span class="s3">{inc:.3f}</span><span class="s2">\t</span><span class="s3">{incdifavg:.3f}</span><span class="s2">\n</span><span class="s3">'</span><span class="s1">.format(inc=inc,incdifavg=incdifavg)) 
+ 
+                    plt.tight_layout() 
+                    plt.subplots_adjust(top=</span><span class="s4">0.95</span><span class="s1">) 
+                    Percentage = (round((counter / (inc_count * omega_count * (f_count))) * </span><span class="s4">100</span><span class="s1">, </span><span class="s4">2</span><span class="s1">)) 
+                    plt.suptitle(</span><span class="s3">'X={x}, m={m}, vz={vz},({total_count}k) Percentage={P}'</span><span class="s1">.format(x=round(x, </span><span class="s4">2</span><span class="s1">), m=m, vz=v,total_count=(omega_count*inc_count*f_count/</span><span class="s4">1000</span><span class="s1">), P=Percentage), fontsize=</span><span class="s4">25</span><span class="s1">) 
+                    plt.savefig(</span><span class="s3">'/Users/atefeh-behzad/Exoplanet_Simulations/Earth_m_Omega_inc_f/HZh{HZhwidth}X{x}m{m}v{v}({total_count}k).pdf'</span><span class="s1">.format(HZhwidth=HZhwidth, x=round(x,</span><span class="s4">2</span><span class="s1">),m=m, v=round(v,</span><span class="s4">2</span><span class="s1">), total_count=(omega_count*(inc_count)*f_count/</span><span class="s4">1000</span><span class="s1">) 
+                                                                                                                                        ), bbox_inches=</span><span class="s3">'tight'</span><span class="s1">) 
+                    g.write(</span><span class="s3">'{m:.1f}</span><span class="s2">\t</span><span class="s3">{vz:.2f}</span><span class="s2">\t</span><span class="s3">{x:.2f}</span><span class="s2">\t</span><span class="s3">{Percentage}</span><span class="s2">\n</span><span class="s3">'</span><span class="s1">.format(m=m, vz=v, x=x, Percentage=Percentage)) 
+ 
+                plt.close()</span></pre>
+</body>
+</html>

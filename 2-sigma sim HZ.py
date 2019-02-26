@@ -49,7 +49,7 @@ x_step = 0.1
 x_max = 100
 x_min0 = 2
 v = 3.0
-m=1
+m=3
 #####################
 
 hz_list = get_ln_list(-4.0, s=0.2, lim=-0.19, rel=operator.le)
@@ -58,8 +58,8 @@ print("hz:", hz_list)
 Percentage_array = []
 
 res = {}
-with open('/Users/atefeh-behzad/Exoplanet_Simulations/2-Sigma/HZ_hz({minhz:.3f}-{maxhz:.3f})_v({v:.2f}_m({m:.2f}).txt'.format(minhz=min(hz_list), maxhz=max(hz_list), v=v, m=m) , 'w+') as g:
-    g.write('hz\tLog(v)\tLog(x)\n')
+with open('/Users/atefeh-behzad/Exoplanet_Simulations/2-Sigma/HZln_hz({minhz:.3f}-{maxhz:.3f})_v({v:.2f})_m({m:.2f}).txt'.format(minhz=min(hz_list), maxhz=max(hz_list), v=v, m=m) , 'w+') as g:
+    g.write('ln(hz)\tv\tln(x)\n')
     for hz in hz_list:
         level = 0
         x_min = x_min0
@@ -96,7 +96,7 @@ with open('/Users/atefeh-behzad/Exoplanet_Simulations/2-Sigma/HZ_hz({minhz:.3f}-
                 print('level 4........................................')
             if level == 5:
                 print('level 5........................................')
-                g.write('{hz:.4f}\t{v:.2f}\t{Lnx:.4f}\n'.format(hz=hz, v=v, Lnx=np.log(x)))
+                g.write('{lnhz:.4f}\t{v:.2f}\t{lnx:.4f}\n'.format(lnhz=np.log(hz), v=v, lnx=np.log(x)))
                 break
             '''here we make lists of omega,x,vz,inc and m'''
             omega_list = get_list(0, 2 * math.pi / omega_count, 2 * math.pi - math.pi / omega_count,
@@ -109,7 +109,7 @@ with open('/Users/atefeh-behzad/Exoplanet_Simulations/2-Sigma/HZ_hz({minhz:.3f}-
             for x in x_list:
 
                 counter = 0                                                         # this is the counter for calculating percentage
-                print('\nhz={hz:.3f}\tv={v:.2f}\tx={x:.3f}'.format(v=v, x=x, hz=hz))
+                print('\nhz={hz:.3f}\tv={v:.2f}\tm={m:.2f}\tx={x:.3f}'.format(v=v, x=x, m=m, hz=hz))
 
                 for inc in inc_list:
 
