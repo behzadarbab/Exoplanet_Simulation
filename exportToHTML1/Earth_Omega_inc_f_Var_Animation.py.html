@@ -1,0 +1,105 @@
+<html>
+<head>
+<title>Earth_Omega_inc_f_Var_Animation.py</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: #999999; font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { color: rgb(0,0,0); }
+.s2 { color: rgb(0,128,128); font-weight: bold; }
+.s3 { color: rgb(0,0,255); }
+.s4 { color: rgb(128,128,128); font-style: italic; }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#c0c0c0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+Earth_Omega_inc_f_Var_Animation.py</FONT>
+</center></TD></TR></TABLE>
+<pre>
+<span class="s0">import </span><span class="s1">rebound 
+</span><span class="s0">import </span><span class="s1">math 
+</span><span class="s0">import </span><span class="s1">operator 
+</span><span class="s0">import </span><span class="s1">matplotlib.pyplot </span><span class="s0">as </span><span class="s1">plt 
+ 
+ 
+ 
+</span><span class="s2">'''we define listing here'''</span><span class="s1"> 
+</span><span class="s0">def </span><span class="s1">get_list(r, s, lim, rel=operator.le): 
+    my_list = [] 
+    </span><span class="s0">while </span><span class="s1">rel(r, lim): 
+        my_list.append(r) 
+        r += s 
+    </span><span class="s0">return </span><span class="s1">my_list 
+ 
+</span><span class="s2">'''here goes the Omega, inclination and true anomaly counts we need'''</span><span class="s1"> 
+omega_count= </span><span class="s3">48            </span><span class="s4">#number of omegas to try from pi/(omega_count/2) to pi (we dont use pi to 2pi because it is symmetric</span><span class="s1"> 
+inc_count= </span><span class="s3">1               </span><span class="s4">#number of inclinations to try from -pi/2 to pi/2 (we have 30 steps)</span><span class="s1"> 
+f_count= </span><span class="s3">48                </span><span class="s4">#number of true anomalies from the step size to 2*pi</span><span class="s1"> 
+ 
+ 
+</span><span class="s2">'''here we make lists of omega,x,vz,inc and m'''</span><span class="s1"> 
+omega_list = get_list(</span><span class="s3">0</span><span class="s1">, </span><span class="s3">2</span><span class="s1">* math.pi/omega_count, </span><span class="s3">2 </span><span class="s1">* math.pi-math.pi/omega_count, rel=operator.le) 
+x_list = get_list(</span><span class="s3">0.5</span><span class="s1">, </span><span class="s3">1</span><span class="s1">, </span><span class="s3">0.5</span><span class="s1">) 
+vz_list = get_list(-</span><span class="s3">1</span><span class="s1">, s=-</span><span class="s3">1</span><span class="s1">, lim=-</span><span class="s3">1</span><span class="s1">, rel=operator.ge) 
+inc_list = get_list(r=-(math.pi/</span><span class="s3">2</span><span class="s1">)+</span><span class="s3">9</span><span class="s1">*math.pi/(</span><span class="s3">48</span><span class="s1">), s=math.pi/(</span><span class="s3">48</span><span class="s1">), lim=-((math.pi/</span><span class="s3">2</span><span class="s1">)-</span><span class="s3">9.02</span><span class="s1">*math.pi/(</span><span class="s3">48</span><span class="s1">)), rel=operator.le) 
+m_list = get_list(r=</span><span class="s3">1</span><span class="s1">, s=</span><span class="s3">0.5</span><span class="s1">, lim=</span><span class="s3">1</span><span class="s1">) 
+f_list = get_list(r=</span><span class="s3">2</span><span class="s1">*math.pi/f_count, s=</span><span class="s3">2</span><span class="s1">*math.pi/f_count, lim=</span><span class="s3">2</span><span class="s1">*math.pi) 
+ 
+</span><span class="s2">'''Printing the lists lengths to see if there is any problem'''</span><span class="s1"> 
+print(inc_list) 
+print(</span><span class="s2">'length of inclination list= {inclist}'</span><span class="s1">.format(inclist=len(inc_list))) 
+print(</span><span class="s2">'length of Omega list= {omegalist}'</span><span class="s1">.format(omegalist=len(omega_list))) 
+print(</span><span class="s2">'length of True anomaly list= {anolist}'</span><span class="s1">.format(anolist=len(f_list))) 
+ 
+ 
+</span><span class="s4"># Percentage_array=[]</span><span class="s1"> 
+ 
+</span><span class="s2">'''calculating the dimensions of the figure (subplots in height and width)'''</span><span class="s1"> 
+</span><span class="s4"># subnumber = math.ceil(math.sqrt(len(inc_list)))</span><span class="s1"> 
+</span><span class="s4"># print('number of rows and columns of subplots: {sub}'.format(sub=subnumber))</span><span class="s1"> 
+ 
+res = {} 
+ 
+</span><span class="s0">for </span><span class="s1">m </span><span class="s0">in </span><span class="s1">m_list: 
+    print(</span><span class="s2">&quot;m= &quot;</span><span class="s1">, m) 
+ 
+    </span><span class="s0">for </span><span class="s1">x </span><span class="s0">in </span><span class="s1">x_list: 
+ 
+        print(</span><span class="s2">&quot;x= &quot;</span><span class="s1">, x) 
+ 
+        </span><span class="s0">for </span><span class="s1">v </span><span class="s0">in </span><span class="s1">vz_list: 
+            print(</span><span class="s2">&quot;vz= &quot;</span><span class="s1">, v) 
+            counter = </span><span class="s3">0</span><span class="s1"> 
+            </span><span class="s0">for </span><span class="s1">inc </span><span class="s0">in </span><span class="s1">inc_list: 
+                inc_name= inc*inc_count/(math.pi) 
+                print(</span><span class="s2">&quot;</span><span class="s0">\t</span><span class="s2"> inc: {Q:.0f}&quot;</span><span class="s1">.format(Q=inc_name)) 
+ 
+                </span><span class="s0">for </span><span class="s1">o </span><span class="s0">in </span><span class="s1">omega_list: 
+                    </span><span class="s0">for </span><span class="s1">f </span><span class="s0">in </span><span class="s1">f_list: 
+                        print (</span><span class="s2">'f= {f}'</span><span class="s1">.format(f=f)) 
+                        sim = rebound.Simulation()  </span><span class="s4"># the simulation starts here</span><span class="s1"> 
+ 
+                        sim.add(m=</span><span class="s3">1</span><span class="s1">)  </span><span class="s4"># add Sun</span><span class="s1"> 
+                        sim.add(m=</span><span class="s3">3e-6</span><span class="s1">, a=</span><span class="s3">1</span><span class="s1">, Omega=o, inc=inc, f=f)  </span><span class="s4"># add Earth</span><span class="s1"> 
+                        sim.add(m=m, x=x, z=</span><span class="s3">50</span><span class="s1">, vz=v)  </span><span class="s4"># add the passing star</span><span class="s1"> 
+ 
+                        sim.move_to_com() 
+                        </span><span class="s0">for </span><span class="s1">tt </span><span class="s0">in </span><span class="s1">range(</span><span class="s3">50</span><span class="s1">): 
+                            print(</span><span class="s2">'t= {t}'</span><span class="s1">.format(t=tt)) 
+ 
+                            </span><span class="s4"># print('\t\t Omega: {O:.0f}'.format(O=o*omega_count/(2*math.pi)))</span><span class="s1"> 
+ 
+ 
+                            sim.integrate(round(</span><span class="s3">2 </span><span class="s1">* </span><span class="s3">50</span><span class="s1">*(tt+</span><span class="s3">25</span><span class="s1">) / ((-v)*</span><span class="s3">100</span><span class="s1">), </span><span class="s3">0</span><span class="s1">))                           </span><span class="s4">#integration</span><span class="s1"> 
+ 
+ 
+                            fig = rebound.OrbitPlot(sim, trails=</span><span class="s0">True</span><span class="s1">, slices=</span><span class="s0">True</span><span class="s1">, color=</span><span class="s0">True</span><span class="s1">,periastron=</span><span class="s0">True</span><span class="s1">, unitlabel=</span><span class="s2">&quot;[AU]&quot;</span><span class="s1">, lim=</span><span class="s3">5.</span><span class="s1">, limz=</span><span class="s3">5</span><span class="s1">) 
+                            plt.suptitle(</span><span class="s2">'X={x} m={m} vz={vz} inc={inc} Omega={Omega} Anomaly={f}'</span><span class="s1">.format(x=round(x,</span><span class="s3">1</span><span class="s1">), m=m, vz=v, inc=inc, Omega=o, f=f)) 
+                            plt.savefig( 
+                                </span><span class="s2">'/Users/Behzadarbab/Exoplanet_Simulations/Earth_Omega&amp;inc_Var_Animation/6/X{x}m{m}v{v}inc{inc}Omega{o}Anomaly{f}t{t}.png'</span><span class="s1">.format( 
+                                    x=round(x, </span><span class="s3">1</span><span class="s1">), m=m, v=v, inc=round(inc, </span><span class="s3">2</span><span class="s1">), o=round(o, </span><span class="s3">2</span><span class="s1">), f=round(f, </span><span class="s3">2</span><span class="s1">), t=(tt+</span><span class="s3">25</span><span class="s1">)), dpi=</span><span class="s3">100</span><span class="s1">) 
+                            plt.close()</span></pre>
+</body>
+</html>
