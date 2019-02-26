@@ -32,7 +32,7 @@ HZhwidth= 0.2              #Habitable Zone Witdh/2
 
 '''here we make lists of omega,x,vz,inc and m'''
 omega_list = get_list(0, 2* math.pi/omega_count, 2 * math.pi-math.pi/omega_count, rel=operator.le)
-x_list = get_list(4.0, 0.1, 4.0)
+x_list = get_list(4.9, 0.1, 4.9)
 vz_list = get_list(-1, s=-0.1, lim=-1, rel=operator.ge)
 inc_list = get_list(r=-((math.pi/2)-math.pi/(inc_count)), s=math.pi/(inc_count), lim=math.pi/2, rel=operator.le)
 m_list = get_list(r=1, s=0.5, lim=1)
@@ -122,7 +122,7 @@ with open('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega_inc_f_4/chance
                                 a_e = sim.calculate_orbits()[0]                         #calculating orbital elements of the planet after the integration
 
                                 '''determine the color of HZ orbits in omega-inc plot'''
-                                if (abs(a_e.a)*(1+a_e.e))<(1+HZhwidth) and (abs(a_e.a)*(1-a_e.e))>(1-HZhwidth):
+                                if (abs(a_e.a)*(1+a_e.e))<(1.37) and (abs(a_e.a)*(1-a_e.e))>(0.95):
                                     Result = '+'
                                     Color = '0'
                                     counter += 1
@@ -130,7 +130,7 @@ with open('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega_inc_f_4/chance
                                     Result = ''
                                     Color = '0.8'
 
-                                plt.plot(o, f, color=Color, marker='s', ms=6.3)
+                                plt.plot(o, f, color=Color, marker='s', ms=6.2)
 
                                 incdifsum += abs(abs(inc)-abs(a_e.inc))
 
@@ -140,15 +140,16 @@ with open('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega_inc_f_4/chance
                                                                                             e=a_e.e, energychange=(100*abs((initenergy-sim.calculate_energy())/initenergy)), Result=Result, angmomdif=angmomdif))
                         # plt.xlabel('Omega (initial phase)')
                         # plt.ylabel('True Initial Anomaly')
-                        plt.title('inclination={inc}[rad]'.format(inc=round(inc, 3)))
-
+                        plt.title('inclination={inc}[rad]'.format(inc=round(inc, 3)), fontsize=20)
+                        plt.yticks(fontsize=15)
+                        plt.xticks(fontsize=15)
                         incdifavg= incdifsum/(len(omega_list)*len(f_list))
                         g.write('\t\t\t{inc:.3f}\t{incdifavg:.3f}\n'.format(inc=inc,incdifavg=incdifavg))
 
                     plt.tight_layout()
                     plt.subplots_adjust(top=0.9)
                     Percentage = (round((counter / (inc_count * omega_count * (f_count))) * 100, 2))
-                    plt.suptitle('X={x}, m={m}, vz={vz},({total_count}k) Percentage={P}'.format(x=round(x, 2), m=m, vz=v,total_count=(omega_count*inc_count*f_count/1000), P=Percentage), fontsize=25)
+                    # plt.suptitle('X={x}, m={m}, vz={vz},({total_count}k) Percentage={P}'.format(x=round(x, 2), m=m, vz=v,total_count=(omega_count*inc_count*f_count/1000), P=Percentage), fontsize=25)
                     plt.savefig('/Users/atefeh-behzad/Exoplanet_Simulations/Earth_Omega_inc_f_4/X{x}m{m}v{v}({total_count}k).pdf'.format(x=round(x,2),m=m, v=round(v,2), total_count=(omega_count*(inc_count)*f_count/1000)
                                                                                                                                         ), bbox_inches='tight')
                     g.write('\t{x:.2f}\t{Percentage}\n'.format(x=x, Percentage=Percentage))

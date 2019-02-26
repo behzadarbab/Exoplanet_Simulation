@@ -17,6 +17,7 @@ import math
 import operator
 import os
 import numpy as np
+from Orbital_Calculations import orbital_cal
 
 
 '''we define listing'''
@@ -40,6 +41,13 @@ def f_maxwell(v, sigma):
     f_v=0.2437*((v**2)/(sigma*3))*math.exp(-(v**2)*0.22676/(sigma**2))
     return f_v
 
+
+'''defining the mass-ratio distribution'''
+def mass_ratio_f(mass_ratio, gamma):
+    c=
+    f_ratio= c*mass_ratio**gamma
+    return f_ratio
+
 '''initializing some parameters'''
 x=1
 x_step=0.1
@@ -53,14 +61,14 @@ x_max=60
 x_min0=1.5
 
 v_sigma=120/30
-m=4
+m=1.1
 #####################
 
-v_mode=2.1*v_sigma
-print('Vmode={v_m:.2f}'.format(v_m=v_mode))
-v_min=v_mode-v_sigma
+v_mean=2.37*v_sigma
+print('Vmode={v_m:.2f}'.format(v_m=v_mean))
+v_min=v_mean-v_sigma
 print('V_min={v_m:.2f}'.format(v_m=v_min))
-v_max=v_mode+v_sigma
+v_max=v_mean+v_sigma
 print('V_max={v_m:.2f}'.format(v_m=v_max))
 v_step=2*v_sigma/10
 print('V_step={v_m:.2f}'.format(v_m=v_step))
